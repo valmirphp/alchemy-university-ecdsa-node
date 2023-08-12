@@ -1,6 +1,6 @@
 import { GuestPersona } from './stub/personas/guest.persona';
 
-describe('AppController (e2e)', () => {
+describe('MainController (e2e)', () => {
   const userPersona = new GuestPersona();
 
   beforeAll(async () => {
@@ -17,8 +17,9 @@ describe('AppController (e2e)', () => {
       url: '/',
     });
 
-    response.statusOK();
-
-    expect(response.bodyRaw).toBe('Hello World!');
+    response
+      .assertNoErrors()
+      .toBe('name', 'Balance blockchain')
+      .toBe('version', 'v0.1');
   });
 });
