@@ -1,9 +1,40 @@
 {
-  "moduleFileExtensions": ["js", "json", "ts"],
-  "rootDir": ".",
+  "moduleFileExtensions": [
+    "js",
+    "json",
+    "ts"
+  ],
+  "rootDir": "../",
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
-  }
+  },
+  "coverageDirectory": ".coverage",
+  "collectCoverageFrom": [
+    "./src/**/*.ts"
+  ],
+  "coveragePathIgnorePatterns": [
+    "node_modules",
+    "<rootDir>/src/main.ts"
+  ],
+  "coverageThreshold": {
+    "global": {
+      "branches": 10,
+      "functions": 10,
+      "lines": 10,
+      "statements": 10
+    }
+  },
+  "moduleNameMapper": {
+    "~/(.*)": "<rootDir>/src/$1",
+    "@core/(.*)": "<rootDir>/src/core/$1",
+    "@core": "<rootDir>/src/core"
+  },
+  "testPathIgnorePatterns": [
+    "<rootDir>/.tmp/",
+    "<rootDir>/.etc/",
+    "<rootDir>/.yarn/"
+  ],
+  "testTimeout": 5000
 }

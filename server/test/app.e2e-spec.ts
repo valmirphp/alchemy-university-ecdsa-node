@@ -1,24 +1,24 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
-import { AppModule } from './../src/app.module';
+import { GuestPersona } from './stub/personas/guest.persona';
 
 describe('AppController (e2e)', () => {
-  let app: INestApplication;
+  const userPersona = new GuestPersona();
 
-  beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    await app.init();
+  beforeAll(async () => {
+    await userPersona.init();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+  afterAll(async () => {
+    await userPersona.close();
+  });
+
+  it('/ (GET)', async () => {
+    const response = await userPersona.http.request({
+      method: 'GET',
+      url: '/',
+    });
+
+    response.statusOK();
+
+    expect(response.bodyRaw).toBe('Hello World!');
   });
 });
