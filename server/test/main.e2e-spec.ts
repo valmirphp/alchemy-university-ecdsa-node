@@ -1,18 +1,18 @@
 import { GuestPersona } from './stub/personas/guest.persona';
 
 describe('MainController (e2e)', () => {
-  const userPersona = new GuestPersona();
+  const guestPersona = new GuestPersona();
 
   beforeAll(async () => {
-    await userPersona.init();
+    await guestPersona.init();
   });
 
   afterAll(async () => {
-    await userPersona.close();
+    await guestPersona.close();
   });
 
   it('/ (GET)', async () => {
-    const response = await userPersona.http.request({
+    const response = await guestPersona.http.request({
       method: 'GET',
       url: '/',
     });
