@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { BlockchainService } from '~/blockchain/blockchain.service';
 import { Wallet } from '~/balance/types';
 
@@ -58,6 +58,33 @@ export class BalanceService {
       action: 'wallet_update',
       wallet,
     });
+  }
+
+  transfer(
+    sender: string,
+    recipient: string,
+    amount: number,
+  ): { balance: number; block: number } {
+    let senderBalance = this.getBalance(sender);
+    let recipientBalance = this.getBalance(recipient);
+
+    if (sender === recipient) {
+      throw new BadRequestException('Sender and recipient must be different!');
+    } else if (senderBalance < amount) {
+      throw new BadRequestException('Not enough funds!');
+    }
+
+    senderBalance -= amount;
+    recipientBalance += amount;
+
+    this.setBalance(sender, senderBalance);
+    this.setBalance(recipient, recipientBalance);
+    this.commit();
+
+    return {
+      balance: senderBalance,
+      block: this.blockchainService.latestIndex(),
+    };
   }
 
   commit(): void {

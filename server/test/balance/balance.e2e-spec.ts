@@ -1,4 +1,4 @@
-import { GuestPersona } from './stub/personas/guest.persona';
+import { GuestPersona } from '../stub/personas/guest.persona';
 
 describe('BalanceController (e2e)', () => {
   const guestPersona = new GuestPersona();
