@@ -1,4 +1,5 @@
 import { GuestPersona } from '../stub/personas/guest.persona';
+import { ADDRESS_STUB } from '../stub/constants';
 
 describe('BlockchainController (e2e)', () => {
   const guestPersona = new GuestPersona();
@@ -6,7 +7,7 @@ describe('BlockchainController (e2e)', () => {
   beforeAll(async () => {
     await guestPersona.init();
 
-    guestPersona.balanceService.setBalance('0x1', 50);
+    guestPersona.balanceService.setBalance(ADDRESS_STUB['0x1'], 50);
     guestPersona.balanceService.commit();
   });
 

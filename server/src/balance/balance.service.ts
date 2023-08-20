@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { BlockchainService } from '~/blockchain/blockchain.service';
-import { WalletEntity } from '~/wallet/wallet.entity';
+import { WalletEntity } from '~/balance/entities/wallet.entity';
 
 type Transaction = {
   action: 'wallet_update';
@@ -16,10 +16,14 @@ export class BalanceService {
   constructor(private readonly blockchainService: BlockchainService) {}
 
   makeWalletKey(address: string) {
+    if (!ethers.isAddress(address)) {
+      throw new BadRequestException('Invalid address');
+    }
+
     return `wallet:${address.toLowerCase()}`;
   }
 
-  all(): Array<Wallet> {
+  all(): Array<WalletEntity> {
     return Object.entries(this.blockchainService.lastData()).reduce(
       (prev, [k, v]) => {
         if (k.startsWith('wallet')) {
@@ -31,7 +35,7 @@ export class BalanceService {
     );
   }
 
-  getWallet(address: string): Wallet | undefined {
+  getWallet(address: string): WalletEntity | undefined {
     const walletKey = this.makeWalletKey(address);
     return this.blockchainService.lastData()[walletKey];
   }
@@ -46,12 +50,12 @@ export class BalanceService {
     const now = new Date();
 
     if (!wallet) {
-      wallet = {
+      wallet = new WalletEntity({
         balance: 0,
         address: ethers.getAddress(address),
         updatedAt: now,
         createdAt: now,
-      };
+      });
     }
 
     wallet.balance = balance;

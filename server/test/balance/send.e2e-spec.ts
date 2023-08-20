@@ -1,5 +1,6 @@
 import { SendDto } from '~/balance/dto/send.dto';
 import { GuestPersona } from '../stub/personas/guest.persona';
+import { ADDRESS_STUB } from '../stub/constants';
 
 describe('SendController (e2e)', () => {
   const guestPersona = new GuestPersona();
@@ -7,7 +8,7 @@ describe('SendController (e2e)', () => {
   beforeAll(async () => {
     await guestPersona.init();
 
-    guestPersona.balanceService.setBalance('0x1', 50);
+    guestPersona.balanceService.setBalance(ADDRESS_STUB['0x1'], 50);
     guestPersona.balanceService.commit();
   });
 
@@ -17,8 +18,8 @@ describe('SendController (e2e)', () => {
 
   it('Success', async () => {
     const dto: SendDto = {
-      sender: '0x1',
-      recipient: '0x2',
+      sender: ADDRESS_STUB['0x1'],
+      recipient: ADDRESS_STUB['0x2'],
       amount: 10,
     };
 
@@ -33,8 +34,8 @@ describe('SendController (e2e)', () => {
 
   it('Sender and recipient must be different!', async () => {
     const dto: SendDto = {
-      sender: '0x1',
-      recipient: '0x1',
+      sender: ADDRESS_STUB['0x1'],
+      recipient: ADDRESS_STUB['0x1'],
       amount: 10,
     };
 
@@ -49,8 +50,8 @@ describe('SendController (e2e)', () => {
 
   it('Not enough funds!', async () => {
     const dto: SendDto = {
-      sender: '0x1',
-      recipient: '0x2',
+      sender: ADDRESS_STUB['0x1'],
+      recipient: ADDRESS_STUB['0x2'],
       amount: 100,
     };
 
@@ -65,8 +66,8 @@ describe('SendController (e2e)', () => {
 
   it('[0x4] Not enough funds!', async () => {
     const dto: SendDto = {
-      sender: '0x4',
-      recipient: '0x2',
+      sender: ADDRESS_STUB['0x4'],
+      recipient: ADDRESS_STUB['0x2'],
       amount: 1,
     };
 
