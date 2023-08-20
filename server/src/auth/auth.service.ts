@@ -28,7 +28,9 @@ export class AuthService {
     const user = this.users.get(address.toLowerCase());
 
     if (!user) {
-      throw new NotFoundException('Nonce not found');
+      throw new NotFoundException(
+        'Duplicate transaction, already signed nonce',
+      );
     }
 
     // validate expiry

@@ -21,7 +21,7 @@ export class BalanceController {
 
   @Get('/:address/faucet')
   faucet(@Param('address') address) {
-    const balance = this.balanceService.getBalance(address) + 1;
+    const balance = this.balanceService.getBalance(address) + 10;
     this.balanceService.setBalance(address, balance);
     this.balanceService.commit();
 
