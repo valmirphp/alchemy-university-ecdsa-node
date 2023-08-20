@@ -93,5 +93,18 @@ describe('BalanceService', () => {
 
     expect(result.balance).toBe(200 - 22);
     expect(result.block).toBe(currentBlock + 1);
+    expect(result.tx).toBeDefined();
+
+    const lastBlock = blockchainService.latestBlock();
+    const data = JSON.parse(lastBlock.data);
+    console.log(data);
+
+    expect(data.events).toHaveLength(1);
+    expect(data.events[0].kind).toBe('transfer');
+    expect(data.events[0].from).toBe(address['0x1']);
+    expect(data.events[0].tx).toBe(result.tx);
+    expect(data.events[0].data.amount).toBe(22);
+    expect(data.events[0].data.sender).toBe(address['0x1']);
+    expect(data.events[0].data.recipient).toBe(address['0x2']);
   });
 });

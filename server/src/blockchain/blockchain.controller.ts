@@ -7,7 +7,7 @@ export class BlockchainController {
   constructor(private readonly blockchainService: BlockchainService) {}
 
   @Get('/')
-  all() {
+  allBlocks() {
     return this.blockchainService
       .all()
       .reverse()
@@ -15,7 +15,7 @@ export class BlockchainController {
   }
 
   @Get('/:id')
-  find(@Param('id') id: string) {
+  findBlock(@Param('id') id: string) {
     const block = this.blockchainService.get(+id);
 
     if (!block) {
@@ -25,10 +25,21 @@ export class BlockchainController {
     return new BlockPresent(block);
   }
 
+  @Get('events')
+  allEvents() {
+    const block = this.blockchainService.latestBlock();
+    return new BlockPresent(block).allEvents();
+  }
+
+  @Get('events/:tx')
+  findEvent(@Param('tx') tx: string) {
+    const block = this.blockchainService.latestBlock();
+    return new BlockPresent(block).findEvent(tx);
+  }
+
   @Get('/last-block')
   lastBlock() {
     const block = this.blockchainService.latestBlock();
-
     return new BlockPresent(block);
   }
 }

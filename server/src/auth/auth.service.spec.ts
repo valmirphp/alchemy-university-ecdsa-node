@@ -1,5 +1,6 @@
 import { ethers } from 'ethers';
 import { Test, TestingModule } from '@nestjs/testing';
+import { ADDRESS_STUB } from '../../test/stub/constants';
 import { AuthService } from '~/auth/auth.service';
 
 describe('AuthService', () => {
@@ -18,39 +19,44 @@ describe('AuthService', () => {
   });
 
   it('should generate nonce', () => {
-    const user = service.generateNonce('0x123');
+    const user = service.generateNonce(ADDRESS_STUB['0x3']);
     expect(user).toBeDefined();
-    expect(user.address).toBe('0x123');
+    expect(user.address).toBe(ADDRESS_STUB['0x3']);
     expect(user.nonce).toBeDefined();
     expect(user.expiry).toBeGreaterThan(Date.now());
   });
 
   it('should get nonce', () => {
-    const user = service.generateNonce('0x123');
-    const nonce = service.getNonce('0x123');
+    const user = service.generateNonce(ADDRESS_STUB['0x3']);
+    const nonce = service.getNonce(ADDRESS_STUB['0x3']);
     expect(nonce).toBe(user.nonce);
 
-    expect(() => service.getNonce('0x456')).toThrowError('Nonce not found');
-  });
-
-  it('should validate nonce', () => {
-    const user = service.generateNonce('0x123');
-
-    expect(() => service.validateNonce('0x123', 'invalid')).toThrowError(
-      'Invalid nonce',
-    );
-
-    const validated = service.validateNonce('0x123', user.nonce);
-    expect(validated).toBeTruthy();
-
-    expect(() => service.validateNonce('0x123', user.nonce)).toThrowError(
+    expect(() => service.getNonce(ADDRESS_STUB['0x4'])).toThrowError(
       'Nonce not found',
     );
   });
 
+  it('should validate nonce', () => {
+    const user = service.generateNonce(ADDRESS_STUB['0x3']);
+
+    expect(() =>
+      service.validateNonce(ADDRESS_STUB['0x3'], 'invalid'),
+    ).toThrowError('Invalid nonce');
+
+    const validated = service.validateNonce(ADDRESS_STUB['0x3'], user.nonce);
+    expect(validated).toBeTruthy();
+
+    expect(() =>
+      service.validateNonce(ADDRESS_STUB['0x3'], user.nonce),
+    ).toThrowError('Nonce not found');
+  });
+
   it('should validate expiry', () => {
-    service.generateNonce('0x123', Date.now() - 1000);
-    expect(() => service.getNonce('0x123')).toThrowError('Expired nonce');
+    service.generateNonce(ADDRESS_STUB['0x3'], Date.now() - 1000);
+
+    expect(() => service.getNonce(ADDRESS_STUB['0x3'])).toThrowError(
+      'Expired nonce',
+    );
   });
 
   it('should sign message', async () => {

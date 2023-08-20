@@ -1,11 +1,14 @@
+import { randomUUID } from 'node:crypto';
 import { ethers } from 'ethers';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { BlockchainService } from '~/blockchain/blockchain.service';
 import { WalletEntity } from '~/balance/entities/wallet.entity';
+import { BlockEvent } from '~/blockchain/block.event';
 
 type Transaction = {
-  action: 'wallet_update';
-  wallet: WalletEntity;
+  action: 'wallet_update' | 'event_add';
+  wallet?: WalletEntity;
+  event?: BlockEvent;
 };
 
 @Injectable()
@@ -45,6 +48,18 @@ export class BalanceService {
     return this.getWallet(address)?.balance || 0;
   }
 
+  setEvent(kind: string, from: string, data: any): string {
+    const event: BlockEvent = {
+      kind,
+      from,
+      data,
+      tx: randomUUID(),
+      timestamp: Date.now(),
+    };
+    this.tmpTransactions.push({ action: 'event_add', event });
+    return event.tx;
+  }
+
   setBalance(address: string, balance: number): void {
     let wallet: WalletEntity = this.getWallet(address);
 
@@ -65,17 +80,12 @@ export class BalanceService {
   }
 
   transfer(
-    signerAddress: string,
     sender: string,
     recipient: string,
     amount: number,
-  ): { balance: number; block: number } {
+  ): { balance: number; block: number; tx: string } {
     let senderBalance = this.getBalance(sender);
     let recipientBalance = this.getBalance(recipient);
-
-    if (signerAddress.toLowerCase() !== sender.toLowerCase()) {
-      throw new BadRequestException('Signer must be the sender!');
-    }
 
     if (sender.toLowerCase() === recipient.toLowerCase()) {
       throw new BadRequestException('Sender and recipient must be different!');
@@ -88,11 +98,14 @@ export class BalanceService {
 
     this.setBalance(sender, senderBalance);
     this.setBalance(recipient, recipientBalance);
+    const tx = this.setEvent('transfer', sender, { sender, recipient, amount });
+
     this.commit();
 
     return {
       balance: senderBalance,
       block: this.blockchainService.latestIndex(),
+      tx,
     };
   }
 
@@ -107,12 +120,18 @@ export class BalanceService {
     while (this.tmpTransactions.length > 0) {
       const transaction = this.tmpTransactions.shift();
 
-      if (transaction.action === 'wallet_update') {
+      if (transaction.action === 'wallet_update' && transaction.wallet) {
         const walletKey = this.makeWalletKey(transaction.wallet.address);
         data[walletKey] = transaction.wallet.toJSON();
 
         this.logger.debug(
           `Updating wallet ${transaction.wallet.address} balance to ${transaction.wallet.balance}`,
+        );
+      } else if (transaction.action === 'event_add' && transaction.event) {
+        data['events'].push(transaction.event);
+
+        this.logger.debug(
+          `Push transaction #${transaction.event.tx} from ${transaction.event.from}`,
         );
       } else {
         this.logger.error(`Invalid transaction: ${transaction.action}`);

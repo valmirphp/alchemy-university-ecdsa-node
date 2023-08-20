@@ -14,13 +14,7 @@ export class SendController {
   send(@Body() dto: SendDto) {
     const { sender, recipient, amount } = dto.data;
 
-    const signerAddress = this.authService.validateTransaction(sender, dto);
-
-    return this.balanceService.transfer(
-      signerAddress,
-      sender,
-      recipient,
-      amount,
-    );
+    this.authService.validateTransaction(sender, dto);
+    return this.balanceService.transfer(sender, recipient, amount);
   }
 }
