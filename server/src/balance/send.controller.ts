@@ -12,6 +12,7 @@ export class SendController {
 
   @Post('/')
   send(@Body() dto: SendDto) {
+    // TODO validate DTO
     const { sender, recipient, amount } = dto.data;
 
     this.authService.validateTransaction(sender, dto);

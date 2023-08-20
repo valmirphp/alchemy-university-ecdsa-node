@@ -37,7 +37,7 @@ describe('BlockchainController (e2e)', () => {
       url: '/blockchain/1',
     });
 
-    response.assertNoErrors().dump().toBe('index', 1);
+    response.assertNoErrors().toBe('index', 1);
   });
 
   it('/blockchain/404 (GET)', async () => {
@@ -73,6 +73,6 @@ describe('BlockchainController (e2e)', () => {
       url: `/blockchain/events/${tx}`,
     });
 
-    response.assertNoErrors().dump().toBe('tx', tx).toBe('data.foo', 'bar');
+    response.assertNoErrors().toBe('tx', tx).toBe('data.foo', 'bar');
   });
 });

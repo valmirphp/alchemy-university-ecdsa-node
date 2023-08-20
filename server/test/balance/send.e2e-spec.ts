@@ -38,7 +38,7 @@ describe('SendController (e2e)', () => {
       body: dto,
     });
 
-    response.assertNoErrors().dump().toBe('balance', 40).toBe('block', 3);
+    response.assertNoErrors().toBe('balance', 40).toBe('block', 3);
   });
 
   it('Invalid nonce', async () => {
