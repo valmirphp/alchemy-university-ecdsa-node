@@ -1,54 +1,77 @@
-import { useState } from "react";
-import {serverApi} from "./server";
+import {useState} from "react";
+import {api} from "./services/server.ts";
+import {TransactionDto, TransferDataDto} from "./dto/send.dto.ts";
 
-function Transfer({ address, setBalance }) {
-  const [sendAmount, setSendAmount] = useState("");
-  const [recipient, setRecipient] = useState("");
+function Transfer({wallet, setBalance}) {
+    const [sendAmount, setSendAmount] = useState("1");
+    const [recipient, setRecipient] = useState("");
+    const [transaction, setTransaction] = useState<TransactionDto>(null);
 
-  const setValue = (setter) => (evt) => setter(evt.target.value);
+    const setValue = (setter) => (evt) => setter(evt.target.value);
 
-  async function transfer(evt) {
-    evt.preventDefault();
-
-    try {
-      const {
-        data: { balance },
-      } = await serverApi.post(`send`, {
-        sender: address,
-        amount: parseInt(sendAmount),
-        recipient,
-      });
-      setBalance(balance);
-    } catch (ex) {
-      alert(ex.response.data.message);
+    function getDto(): TransferDataDto {
+        return {
+            sender: wallet.address,
+            amount: parseInt(sendAmount),
+            recipient,
+        }
     }
-  }
 
-  return (
-    <form className="container transfer" onSubmit={transfer}>
-      <h1>Send Transaction</h1>
+    async function sign(evt) {
+        evt.preventDefault();
 
-      <label>
-        Send Amount
-        <input
-          placeholder="1, 2, 3..."
-          value={sendAmount}
-          onChange={setValue(setSendAmount)}
-        ></input>
-      </label>
+        try {
+            const trans = await api.signTransaction(wallet, getDto())
+            setTransaction(trans)
+        } catch (e) {
+            alert(e.message)
+        }
+    }
 
-      <label>
-        Recipient
-        <input
-          placeholder="Type an address, for example: 0x2"
-          value={recipient}
-          onChange={setValue(setRecipient)}
-        ></input>
-      </label>
+    async function transfer(evt) {
+        evt.preventDefault();
 
-      <input type="submit" className="button" value="Transfer" />
-    </form>
-  );
+        try {
+            const response = await api.sendTransaction(transaction)
+            alert(`Transaction sent! \nBlock: ${response.block} \nBalance: ${response.balance} \nHash: ${response.tx}`)
+            setBalance(response.balance)
+        } catch (e) {
+            alert(e.message)
+        }
+    }
+
+    return (
+        <form className="container transfer" onSubmit={transfer}>
+            <h1>Send Transaction</h1>
+
+            <label>
+                Send Amount
+                <input
+                    placeholder="1, 2, 3..."
+                    type={"number"}
+                    step={1}
+                    value={sendAmount}
+                    onChange={setValue(setSendAmount)}
+                ></input>
+            </label>
+
+            <label>
+                Recipient
+                <input
+                    placeholder="Type an address, for example: 0x2"
+                    value={recipient}
+                    onChange={setValue(setRecipient)}
+                ></input>
+            </label>
+
+            <label>Hash: {transaction?.hash}</label>
+
+            <div>
+                <input type="button" className="button" value="Sign" onClick={sign} style={{backgroundColor: "#f6d507"}}/>
+                <input type="button" className="button" value="Transfer" onClick={transfer}/>
+            </div>
+        </form>
+    );
 }
 
 export default Transfer;
