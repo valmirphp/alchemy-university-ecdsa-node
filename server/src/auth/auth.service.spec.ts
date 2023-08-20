@@ -69,6 +69,6 @@ describe('AuthService', () => {
     const signature = await wallet.signMessage(message);
     const verified = service.verifyMessage(message, signature, wallet.address);
 
-    expect(verified).toBeTruthy();
+    expect(verified).toBe(wallet.address);
   });
 });

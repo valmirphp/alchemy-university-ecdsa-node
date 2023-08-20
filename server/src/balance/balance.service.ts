@@ -48,19 +48,15 @@ export class BalanceService {
   setBalance(address: string, balance: number): void {
     let wallet: WalletEntity = this.getWallet(address);
 
-    const now = new Date();
-
     if (!wallet) {
       wallet = new WalletEntity({
         balance: 0,
         address: ethers.getAddress(address),
-        updatedAt: now,
-        createdAt: now,
       });
     }
 
     wallet.balance = balance;
-    wallet.updatedAt = now;
+    wallet.updatedAt = new Date();
 
     this.tmpTransactions.push({
       action: 'wallet_update',
@@ -69,6 +65,7 @@ export class BalanceService {
   }
 
   transfer(
+    signerAddress: string,
     sender: string,
     recipient: string,
     amount: number,
@@ -76,7 +73,11 @@ export class BalanceService {
     let senderBalance = this.getBalance(sender);
     let recipientBalance = this.getBalance(recipient);
 
-    if (sender === recipient) {
+    if (signerAddress.toLowerCase() !== sender.toLowerCase()) {
+      throw new BadRequestException('Signer must be the sender!');
+    }
+
+    if (sender.toLowerCase() === recipient.toLowerCase()) {
       throw new BadRequestException('Sender and recipient must be different!');
     } else if (senderBalance < amount) {
       throw new BadRequestException('Not enough funds!');

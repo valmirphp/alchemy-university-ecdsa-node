@@ -1,6 +1,13 @@
 import { randomUUID } from 'node:crypto';
 import { ethers } from 'ethers';
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { hashMessage } from '@core/utils';
+import { TransactionEntity } from '~/auth/transaction.entity';
 
 type UserNonce = {
   address: string;
@@ -14,21 +21,29 @@ export class AuthService {
   private users = new Map<string, UserNonce>();
 
   getNonce(address: string): string {
+    if (!ethers.isAddress(address)) {
+      throw new BadRequestException('Invalid address');
+    }
+
     const user = this.users.get(address.toLowerCase());
 
     if (!user) {
-      throw new Error('Nonce not found');
+      throw new NotFoundException('Nonce not found');
     }
 
     // validate expiry
     if (user.expiry < Date.now()) {
-      throw new Error('Expired nonce');
+      throw new UnauthorizedException('Expired nonce');
     }
 
     return user.nonce;
   }
 
   generateNonce(address: string, expiryIn?: number): UserNonce {
+    if (!ethers.isAddress(address)) {
+      throw new BadRequestException('Invalid address');
+    }
+
     const user: UserNonce = {
       address,
       nonce: randomUUID(),
@@ -44,7 +59,7 @@ export class AuthService {
 
     // validate nonce
     if (actualNonce !== expectedNonce) {
-      throw new Error('Invalid nonce');
+      throw new UnauthorizedException('Invalid nonce');
     }
 
     this.users.delete(address.toLowerCase());
@@ -60,8 +75,46 @@ export class AuthService {
     message: string,
     signature: string,
     publicKey: string,
-  ): boolean {
+  ): string | null {
     const signerAddress = ethers.verifyMessage(message, signature);
-    return publicKey.toLowerCase() === signerAddress.toLowerCase();
+
+    return publicKey.toLowerCase() === signerAddress.toLowerCase()
+      ? signerAddress
+      : null;
+  }
+
+  validateTransaction(sender: string, dto: TransactionEntity<any>): string {
+    const hashDto = JSON.stringify(dto.data) + dto.nonce;
+    const hash = hashMessage(hashDto);
+
+    if (hash !== dto.hash) {
+      throw new UnauthorizedException('Invalid hash');
+    }
+
+    const signerAddress = this.verifyMessage(dto.hash, dto.signature, sender);
+    if (!signerAddress) {
+      throw new UnauthorizedException('Invalid signature');
+    }
+
+    this.validateNonce(signerAddress, dto.nonce);
+
+    return signerAddress;
+  }
+
+  async signTransaction<T = Record<string, any>>(
+    privateKey: string,
+    data: T,
+  ): Promise<TransactionEntity<T>> {
+    const sender = new ethers.Wallet(privateKey).address;
+    const nonce = this.generateNonce(sender).nonce;
+    const hash = hashMessage(JSON.stringify(data) + nonce);
+    const signature = await this.signMessage(hash, privateKey);
+
+    return new TransactionEntity<T>({
+      hash,
+      signature,
+      data,
+      nonce,
+    });
   }
 }

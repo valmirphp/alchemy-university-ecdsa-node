@@ -15,6 +15,19 @@ describe('BalanceController (e2e)', () => {
     await guestPersona.close();
   });
 
+  it('/balance (GET)', async () => {
+    const response = await guestPersona.http.request({
+      method: 'GET',
+      url: `/balance`,
+    });
+
+    response
+      .assertNoErrors()
+      .toHaveLength('', 1)
+      .toBe('0.address', ADDRESS_STUB['0x1'])
+      .toBe('0.balance', 50);
+  });
+
   it('/balance/0x1 (GET)', async () => {
     const response = await guestPersona.http.request({
       method: 'GET',
@@ -31,6 +44,15 @@ describe('BalanceController (e2e)', () => {
     });
 
     response.assertNoErrors().toBe('balance', 0);
+  });
+
+  it('/balance/xxx (GET)', async () => {
+    const response = await guestPersona.http.request({
+      method: 'GET',
+      url: `/balance/xxx`,
+    });
+
+    response.assertStatusHttp(400).assertErrorMessage('Invalid address');
   });
 
   it('/balance/0x1/faucet (GET)', async () => {

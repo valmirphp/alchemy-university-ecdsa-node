@@ -16,6 +16,9 @@
   ],
   "coveragePathIgnorePatterns": [
     "node_modules",
+    "<rootDir>/src/auth/auth.service.spec.ts",
+    "<rootDir>/src/balance/balance.service.spec.ts",
+    "<rootDir>/src/blockchain/blockchain.service.spec.ts",
     "<rootDir>/src/main.ts"
   ],
   "coverageThreshold": {

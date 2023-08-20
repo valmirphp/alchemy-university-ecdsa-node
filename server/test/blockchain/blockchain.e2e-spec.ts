@@ -24,13 +24,22 @@ describe('BlockchainController (e2e)', () => {
     response.assertNoErrors().toHaveLength('', 3);
   });
 
-  it('/blockchain/{id} (GET)', async () => {
+  it('/blockchain/1 (GET)', async () => {
     const response = await guestPersona.http.request({
       method: 'GET',
       url: '/blockchain/1',
     });
 
     response.assertNoErrors().dump().toBe('index', 1);
+  });
+
+  it('/blockchain/404 (GET)', async () => {
+    const response = await guestPersona.http.request({
+      method: 'GET',
+      url: '/blockchain/404',
+    });
+
+    response.assertStatusHttp(404).assertErrorMessage('Block not found');
   });
 
   it('/blockchain/last-block (GET)', async () => {

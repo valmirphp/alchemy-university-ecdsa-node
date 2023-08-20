@@ -5,6 +5,11 @@ import { BalanceService } from '~/balance/balance.service';
 export class BalanceController {
   constructor(private readonly balanceService: BalanceService) {}
 
+  @Get('/')
+  allWallets() {
+    return this.balanceService.all();
+  }
+
   @Get('/:address')
   getBalance(@Param('address') address) {
     const balance = this.balanceService.getBalance(address);
