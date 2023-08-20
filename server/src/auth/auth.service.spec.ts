@@ -33,6 +33,21 @@ describe('AuthService', () => {
     expect(() => service.getNonce('0x456')).toThrowError('Nonce not found');
   });
 
+  it('should validate nonce', () => {
+    const user = service.generateNonce('0x123');
+
+    expect(() => service.validateNonce('0x123', 'invalid')).toThrowError(
+      'Invalid nonce',
+    );
+
+    const validated = service.validateNonce('0x123', user.nonce);
+    expect(validated).toBeTruthy();
+
+    expect(() => service.validateNonce('0x123', user.nonce)).toThrowError(
+      'Nonce not found',
+    );
+  });
+
   it('should validate expiry', () => {
     service.generateNonce('0x123', Date.now() - 1000);
     expect(() => service.getNonce('0x123')).toThrowError('Expired nonce');

@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
 import { BlockchainService } from '~/blockchain/blockchain.service';
 import { BlockPresent } from '~/blockchain/block.present';
 
@@ -12,6 +12,17 @@ export class BlockchainController {
       .all()
       .reverse()
       .map((block) => new BlockPresent(block));
+  }
+
+  @Get('/:id')
+  find(@Param('id') id: string) {
+    const block = this.blockchainService.get(+id);
+
+    if (!block) {
+      throw new NotFoundException('Block not found');
+    }
+
+    return new BlockPresent(block);
   }
 
   @Get('/last-block')

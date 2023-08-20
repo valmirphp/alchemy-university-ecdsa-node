@@ -24,6 +24,15 @@ describe('BlockchainController (e2e)', () => {
     response.assertNoErrors().toHaveLength('', 3);
   });
 
+  it('/blockchain/{id} (GET)', async () => {
+    const response = await guestPersona.http.request({
+      method: 'GET',
+      url: '/blockchain/1',
+    });
+
+    response.assertNoErrors().dump().toBe('index', 1);
+  });
+
   it('/blockchain/last-block (GET)', async () => {
     const response = await guestPersona.http.request({
       method: 'GET',

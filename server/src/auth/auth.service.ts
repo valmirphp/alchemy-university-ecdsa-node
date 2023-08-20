@@ -39,6 +39,18 @@ export class AuthService {
     return user;
   }
 
+  validateNonce(address: string, expectedNonce: string): boolean {
+    const actualNonce = this.getNonce(address);
+
+    // validate nonce
+    if (actualNonce !== expectedNonce) {
+      throw new Error('Invalid nonce');
+    }
+
+    this.users.delete(address.toLowerCase());
+    return true;
+  }
+
   signMessage(message: string, privateKey: string): Promise<string> {
     const wallet = new ethers.Wallet(privateKey);
     return wallet.signMessage(message);

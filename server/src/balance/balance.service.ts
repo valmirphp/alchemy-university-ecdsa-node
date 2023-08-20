@@ -37,7 +37,8 @@ export class BalanceService {
 
   getWallet(address: string): WalletEntity | undefined {
     const walletKey = this.makeWalletKey(address);
-    return this.blockchainService.lastData()[walletKey];
+    const data = this.blockchainService.lastData()[walletKey];
+    return data ? new WalletEntity(data) : undefined;
   }
 
   getBalance(address: string): number {
@@ -107,7 +108,7 @@ export class BalanceService {
 
       if (transaction.action === 'wallet_update') {
         const walletKey = this.makeWalletKey(transaction.wallet.address);
-        data[walletKey] = transaction.wallet;
+        data[walletKey] = transaction.wallet.toJSON();
 
         this.logger.debug(
           `Updating wallet ${transaction.wallet.address} balance to ${transaction.wallet.balance}`,
