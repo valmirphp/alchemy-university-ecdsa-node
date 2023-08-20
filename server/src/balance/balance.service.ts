@@ -1,10 +1,11 @@
+import { ethers } from 'ethers';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { BlockchainService } from '~/blockchain/blockchain.service';
-import { Wallet } from '~/balance/types';
+import { WalletEntity } from '~/wallet/wallet.entity';
 
 type Transaction = {
   action: 'wallet_update';
-  wallet: Wallet;
+  wallet: WalletEntity;
 };
 
 @Injectable()
@@ -15,7 +16,7 @@ export class BalanceService {
   constructor(private readonly blockchainService: BlockchainService) {}
 
   makeWalletKey(address: string) {
-    return `wallet:${address}`;
+    return `wallet:${address.toLowerCase()}`;
   }
 
   all(): Array<Wallet> {
@@ -40,19 +41,21 @@ export class BalanceService {
   }
 
   setBalance(address: string, balance: number): void {
-    let wallet = this.getWallet(address);
+    let wallet: WalletEntity = this.getWallet(address);
+
+    const now = new Date();
 
     if (!wallet) {
       wallet = {
-        address,
         balance: 0,
-        updatedAt: Date.now(),
-        createdAt: Date.now(),
+        address: ethers.getAddress(address),
+        updatedAt: now,
+        createdAt: now,
       };
     }
 
     wallet.balance = balance;
-    wallet.updatedAt = Date.now();
+    wallet.updatedAt = now;
 
     this.tmpTransactions.push({
       action: 'wallet_update',
