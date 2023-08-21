@@ -5,6 +5,11 @@ import { BalanceService } from '~/balance/balance.service';
 export class BalanceController {
   constructor(private readonly balanceService: BalanceService) {}
 
+  @Get('/')
+  allWallets() {
+    return this.balanceService.all();
+  }
+
   @Get('/:address')
   getBalance(@Param('address') address) {
     const balance = this.balanceService.getBalance(address);
@@ -16,7 +21,7 @@ export class BalanceController {
 
   @Get('/:address/faucet')
   faucet(@Param('address') address) {
-    const balance = this.balanceService.getBalance(address) + 1;
+    const balance = this.balanceService.getBalance(address) + 10;
     this.balanceService.setBalance(address, balance);
     this.balanceService.commit();
 

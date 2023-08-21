@@ -8,7 +8,7 @@ export class BlockchainService {
 
   constructor() {
     this.blockchain = new Blockchain();
-    this.mine({ startedAt: Date.now() });
+    this.mine({ startedAt: Date.now(), events: [] });
   }
 
   get(index: number): Block {

@@ -1,8 +1,9 @@
 import { AbstractPersona } from '@nestjs-toolkit/test-suite/personas';
 import { AbstractAppTestSuite } from '@nestjs-toolkit/test-suite';
-import { FakeUser } from '../types';
-import { MainSuite } from '../main-suite';
 import { BalanceService } from '~/balance/balance.service';
+import { AuthService } from '~/auth/auth.service';
+import { MainSuite } from '../main-suite';
+import { FakeUser } from '../types';
 
 export class GuestPersona extends AbstractPersona<FakeUser> {
   public user: FakeUser = {
@@ -12,6 +13,10 @@ export class GuestPersona extends AbstractPersona<FakeUser> {
 
   get balanceService(): BalanceService {
     return this.getProvider(BalanceService);
+  }
+
+  get authService(): AuthService {
+    return this.getProvider(AuthService);
   }
 
   protected async onInit(): Promise<void> {
