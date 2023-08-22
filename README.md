@@ -93,3 +93,9 @@ Host: api-ua-ecdsa-node.onrender.com
 	"signature": "0x94ade6b6bc63ee00ad3b3c55bb0925341c322efc41a8f138800138a28842079d344362b193e0fedc8ddb0c474f72665938989c112045391093e5e6a0e75fee671b"
 }
 ```
+
+## References
+
+- [Blockchaindemo.io](https://github.com/0xs34n/blockchain)
+- [University Alchemy - Course Ethereum](https://university.alchemy.com/course/ethereum/)
+

@@ -8,6 +8,7 @@ import {HdWallet} from "./helpers/hd-wallet.ts";
 import {IWallet, WalletFactory} from "./services/wallet.ts";
 import LastBlockchain from "./LastBlockchain.tsx";
 import {BlockChain} from "./services/types.ts";
+import Footer from "./Footer.tsx";
 
 function App() {
     const [wallet, setWallet] = useState<IWallet>();
@@ -51,9 +52,12 @@ function App() {
 
     if (!wallet) {
         return (
-            <div className="app">
-                <Auth setWallet={setWallet}/>
-            </div>
+            <>
+                <div className="app">
+                    <Auth setWallet={setWallet}/>
+                </div>
+                <Footer/>
+            </>
         )
     }
 
@@ -74,6 +78,8 @@ function App() {
                     <LastBlockchain block={blockchain}/>
                 </div>
             )}
+
+            <Footer/>
         </div>
     );
 }
