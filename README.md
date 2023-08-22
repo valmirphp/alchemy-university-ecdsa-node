@@ -40,7 +40,7 @@ The application should connect to the default server port (3042) automatically!
 
 ### WebApp
 
-Visit [ecdsa-node.onrender.com](https://ecdsa-node.onrender.com/) to see the webapp in action!
+Visit [ua-ecdsa-node.onrender.com](https://ua-ecdsa-node.onrender.com/) to see the webapp in action!
 
 ### API
 
