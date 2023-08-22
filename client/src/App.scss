@@ -59,6 +59,7 @@ input {
   letter-spacing: 1px;
   font-weight: 400;
   font-size: .9em;
+
   &:hover {
     cursor: pointer;
   }
@@ -83,4 +84,29 @@ input {
 .transfer {
   display: flex;
   flex-direction: column;
+}
+
+.icon-checked {
+  width: 24px;
+  height: 24px;
+  position: relative;
+}
+
+.icon-checked::before {
+  //content: "\2713"; /* Unicode checkmark character */
+  content: "✅"; /* emoji checkmark character */
+  font-size: 18px;
+  color: #fff;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.row-center-items {
+  display: flex;
+  flex-direction: row;
+  justify-items: center;
+  align-items: center;
+  column-gap: 12px;
 }

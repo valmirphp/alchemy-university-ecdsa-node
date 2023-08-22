@@ -1,9 +1,7 @@
 import {AxiosInstance} from "axios";
-import {TransactionDto, TransferDataDto} from "../dto/send.dto.ts";
-import {Wallet} from "ethers";
-import {toHex, utf8ToBytes} from 'ethereum-cryptography/utils';
 import {keccak256} from 'ethereum-cryptography/keccak';
-
+import {toHex, utf8ToBytes} from 'ethereum-cryptography/utils';
+import {TransactionDto, TransferDataDto} from "../dto/send.dto.ts";
 
 export type TransactionResponse = {
     tx: string
@@ -46,7 +44,7 @@ export class ApiService {
         }
     }
 
-    async signTransaction(wallet: Wallet, data: TransferDataDto): Promise<TransactionDto> {
+    async preSignTransaction( data: TransferDataDto): Promise<TransactionDto> {
         if (!data.sender) throw new Error("Sender is required")
         if (!data.amount) throw new Error("Send amount is required")
         if (!data.recipient) throw new Error("Recipient is required")
@@ -61,7 +59,6 @@ export class ApiService {
         }
 
         trans.hash = this.hashMessage(JSON.stringify(data) + nonce)
-        trans.signature = await wallet.signMessage(trans.hash)
 
         // const hashMessage = ethers.hashMessage(JSON.stringify(data) + nonce)
         // trans.hash = ethers.keccak256(hashMessage)

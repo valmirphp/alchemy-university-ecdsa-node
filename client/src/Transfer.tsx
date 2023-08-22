@@ -21,8 +21,11 @@ function Transfer({wallet, setBalance}) {
         evt.preventDefault();
 
         try {
-            const trans = await api.signTransaction(wallet, getDto())
+            const trans = await api.preSignTransaction(getDto())
             setTransaction(trans)
+
+            trans.signature = await wallet.signMessage(trans.hash)
+            setTransaction({...trans})
         } catch (e) {
             alert(e.message)
         }
@@ -64,10 +67,14 @@ function Transfer({wallet, setBalance}) {
                 ></input>
             </label>
 
-            <label>Hash: {transaction?.hash}</label>
+            <label className='row-center-items'>
+                Hash: {transaction?.hash}
+                {transaction?.signature && <span className='icon-checked'></span>}
+            </label>
 
-            <div>
-                <input type="button" className="button" value="Sign" onClick={sign} style={{backgroundColor: "#f6d507"}}/>
+            <div className='row-center-items'>
+                <input type="button" className="button" value="Sign" onClick={sign}
+                       style={{backgroundColor: "#f6d507"}}/>
                 <input type="button" className="button" value="Transfer" onClick={transfer}/>
             </div>
         </form>

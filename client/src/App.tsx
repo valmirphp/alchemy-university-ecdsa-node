@@ -1,14 +1,14 @@
-import {ethers} from "ethers";
+import {useEffect, useState} from "react";
+import "./App.scss";
 import Wallet from "./Wallet";
 import Transfer from "./Transfer";
-import "./App.scss";
-import {useEffect, useState} from "react";
 import Auth from "./Auth.tsx";
 import {api} from "./services/server.ts";
 import {HdWallet} from "./helpers/hd-wallet.ts";
+import {IWallet, WalletFactory} from "./services/wallet.ts";
 
 function App() {
-    const [wallet, setWallet] = useState<ethers.Wallet>();
+    const [wallet, setWallet] = useState<IWallet>();
     const [balance, setBalance] = useState(0);
 
     const loadBalance: () => void = () => {
@@ -16,16 +16,17 @@ function App() {
     }
 
     useEffect(() => {
-        if (wallet?.address) {
+        if (wallet?.privateKey) {
             HdWallet.store(wallet.privateKey);
-            loadBalance();
         }
+
+        loadBalance();
     }, [wallet]);
 
     useEffect(() => {
         const privateKey = HdWallet.retrieve();
         if (privateKey) {
-            const wallet = new ethers.Wallet(privateKey);
+            const wallet = WalletFactory.fromPrivateKey(privateKey);
             setWallet(wallet);
         }
     }, [])
@@ -34,8 +35,6 @@ function App() {
         HdWallet.clear();
         setWallet(undefined);
     }
-
-
 
     if (!wallet) {
         return (
