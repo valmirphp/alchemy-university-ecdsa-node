@@ -6,14 +6,25 @@ import Auth from "./Auth.tsx";
 import {api} from "./services/server.ts";
 import {HdWallet} from "./helpers/hd-wallet.ts";
 import {IWallet, WalletFactory} from "./services/wallet.ts";
+import LastBlockchain from "./LastBlockchain.tsx";
+import {BlockChain} from "./services/types.ts";
 
 function App() {
     const [wallet, setWallet] = useState<IWallet>();
     const [balance, setBalance] = useState(0);
+    const [blockchain, setBlockchain] = useState<BlockChain>(null);
+
+    const loadBlockchain = () => {
+        api.getLastBlockchain().then((blockchain) => setBlockchain(blockchain))
+    }
 
     const loadBalance: () => void = () => {
         if (wallet?.address) api.getBalance(wallet.address).then((balance) => setBalance(balance))
     }
+
+    useEffect(() => {
+        loadBlockchain();
+    }, [balance]);
 
     useEffect(() => {
         if (wallet?.privateKey) {
@@ -29,6 +40,8 @@ function App() {
             const wallet = WalletFactory.fromPrivateKey(privateKey);
             setWallet(wallet);
         }
+
+        loadBlockchain();
     }, [])
 
     const logout = () => {
@@ -45,14 +58,22 @@ function App() {
     }
 
     return (
-        <div className="app">
-            <Wallet
-                balance={balance}
-                wallet={wallet}
-                logout={logout}
-                setBalance={setBalance}
-            />
-            <Transfer setBalance={setBalance} wallet={wallet}/>
+        <div>
+            <div className="app">
+                <Wallet
+                    balance={balance}
+                    wallet={wallet}
+                    logout={logout}
+                    setBalance={setBalance}
+                />
+                <Transfer setBalance={setBalance} wallet={wallet}/>
+            </div>
+
+            {blockchain && (
+                <div className="app" style={{marginTop: '24px'}}>
+                    <LastBlockchain block={blockchain}/>
+                </div>
+            )}
         </div>
     );
 }

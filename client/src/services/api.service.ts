@@ -2,6 +2,7 @@ import {AxiosInstance} from "axios";
 import {keccak256} from 'ethereum-cryptography/keccak';
 import {toHex, utf8ToBytes} from 'ethereum-cryptography/utils';
 import {TransactionDto, TransferDataDto} from "../dto/send.dto.ts";
+import {BlockChain} from "./types.ts";
 
 export type TransactionResponse = {
     tx: string
@@ -44,7 +45,7 @@ export class ApiService {
         }
     }
 
-    async preSignTransaction( data: TransferDataDto): Promise<TransactionDto> {
+    async preSignTransaction(data: TransferDataDto): Promise<TransactionDto> {
         if (!data.sender) throw new Error("Sender is required")
         if (!data.amount) throw new Error("Send amount is required")
         if (!data.recipient) throw new Error("Recipient is required")
@@ -76,6 +77,16 @@ export class ApiService {
         try {
             const response = await this.client.post('/send', data)
             console.log("transfer", {...response.data})
+            return response.data;
+        } catch (e) {
+            this.failedRequestHandler(e)
+        }
+    }
+
+    async getLastBlockchain(): Promise<BlockChain> {
+        try {
+            const response = await this.client.get('/blockchain/last-block')
+            console.log("getLastBlockchain", {...response.data})
             return response.data;
         } catch (e) {
             this.failedRequestHandler(e)
