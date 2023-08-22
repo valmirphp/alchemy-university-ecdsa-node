@@ -15,7 +15,7 @@ const LastBlockchain: React.FC<Props> = ({block}) => {
                     API Endpoints
                 </a>
                 {` | `}
-                <a href="https://github.com/valmirphp/alchemy-university-ecdsa-node#API" target='_blank'>
+                <a href="https://github.com/valmirphp/alchemy-university-ecdsa-node#api" target='_blank'>
                     API Documentation
                 </a>
             </div>
